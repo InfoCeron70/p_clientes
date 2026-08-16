@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/formularios.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-users"></i>
+                <span>ClientesPro</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-link active" data-view="dashboard">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-link" data-view="clientes">
+                <i class="fas fa-address-book"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="#" class="nav-link" data-view="nuevo">
+                <i class="fas fa-user-plus"></i>
+                <span>Nuevo Cliente</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+                <i class="fas fa-moon"></i>
+                <span>Modo Oscuro</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="mobile-header">
+            <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo-mobile">
+                <i class="fas fa-users"></i>
+                <span>ClientesPro</span>
+            </div>
+            <button class="theme-toggle-mobile" id="themeToggleMobile" aria-label="Cambiar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- DASHBOARD -->
+        <section class="view" id="view-dashboard">
+            <div class="page-header">
+                <h1><i class="fas fa-chart-pie"></i> Dashboard</h1>
+                <p class="page-subtitle">Resumen general de clientes</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon kpi-primary"><i class="fas fa-users"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiTotal">0</span>
+                        <span class="kpi-label">Total Clientes</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon kpi-success"><i class="fas fa-check-circle"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiActivos">0</span>
+                        <span class="kpi-label">Clientes Activos</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon kpi-warning"><i class="fas fa-star"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiSatisfaccion">0</span>
+                        <span class="kpi-label">Satisfacción Promedio</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon kpi-info"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiCiudades">0</span>
+                        <span class="kpi-label">Ciudades</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-bar"></i> Clientes por Categoría</h3>
+                    <div class="chart-container"><canvas id="chartCategorias"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line"></i> Clientes por Mes</h3>
+                    <div class="chart-container"><canvas id="chartMeses"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-pie"></i> Distribución por Estado</h3>
+                    <div class="chart-container"><canvas id="chartEstados"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-star-half-alt"></i> Distribución de Satisfacción</h3>
+                    <div class="chart-container"><canvas id="chartSatisfaccion"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTA DE CLIENTES -->
+        <section class="view hidden" id="view-clientes">
+            <div class="page-header">
+                <h1><i class="fas fa-address-book"></i> Lista de Clientes</h1>
+                <p class="page-subtitle">Gestiona todos tus clientes</p>
+            </div>
+
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar por nombre, email o ciudad...">
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <div class="filter-group">
+                        <select id="filterCategoria">
+                            <option value="">Todas las categorías</option>
+                            <option value="VIP">VIP</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Nuevo">Nuevo</option>
+                            <option value="Potencial">Potencial</option>
+                        </select>
+                        <select id="filterEstado">
+                            <option value="">Todos los estados</option>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" id="btnImportarExcel">
+                        <i class="fas fa-file-upload"></i> Importar Excel
+                    </button>
+                    <button class="btn btn-success" id="btnExportarExcel">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
+                    </button>
+                    <button class="btn btn-primary" id="btnNuevoCliente">
+                        <i class="fas fa-plus"></i> Nuevo
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="data-table" id="tablaClientes">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="nombre">Nombre <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="email">Email <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="telefono">Teléfono <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="ciudad">Ciudad <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="categoria">Categoría <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="satisfaccion">Satisfacción <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="estado">Estado <i class="fas fa-sort"></i></th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </section>
+
+        <!-- FORMULARIO CLIENTE -->
+        <section class="view hidden" id="view-nuevo">
+            <div class="page-header">
+                <h1><i class="fas fa-user-plus"></i> <span id="formTitle">Nuevo Cliente</span></h1>
+                <p class="page-subtitle" id="formSubtitle">Completa la información del cliente</p>
+            </div>
+
+            <form class="cliente-form" id="formCliente" novalidate>
+                <!-- CAMPO OCULTO CRÍTICO: ID del cliente -->
+                <input type="hidden" id="clienteId" name="id" value="">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nombre">Nombre completo <span class="required">*</span></label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
+                        <span class="error-msg" id="error-nombre"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Correo electrónico <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="Ej: juan@email.com" required>
+                        <span class="error-msg" id="error-email"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono <span class="required">*</span></label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 300 123 4567" required>
+                        <span class="error-msg" id="error-telefono"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="ciudad">Ciudad <span class="required">*</span></label>
+                        <input type="text" id="ciudad" name="ciudad" placeholder="Ej: Bogotá" required>
+                        <span class="error-msg" id="error-ciudad"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="departamento">Departamento <span class="required">*</span></label>
+                        <input type="text" id="departamento" name="departamento" placeholder="Ej: Cundinamarca" required>
+                        <span class="error-msg" id="error-departamento"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha">Fecha de registro <span class="required">*</span></label>
+                        <input type="date" id="fecha" name="fecha" required>
+                        <span class="error-msg" id="error-fecha"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoría <span class="required">*</span></label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="VIP">VIP</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Nuevo">Nuevo</option>
+                            <option value="Potencial">Potencial</option>
+                        </select>
+                        <span class="error-msg" id="error-categoria"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="estado">Estado <span class="required">*</span></label>
+                        <select id="estado" name="estado" required>
+                            <option value="">Selecciona un estado</option>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                        <span class="error-msg" id="error-estado"></span>
+                    </div>
+                </div>
+
+                <div class="form-group satisfaccion-group">
+                    <label>Nivel de satisfacción <span class="required">*</span></label>
+                    <div class="star-rating" id="starRating">
+                        <button type="button" data-value="1" aria-label="1 estrella"><i class="far fa-star"></i></button>
+                        <button type="button" data-value="2" aria-label="2 estrellas"><i class="far fa-star"></i></button>
+                        <button type="button" data-value="3" aria-label="3 estrellas"><i class="far fa-star"></i></button>
+                        <button type="button" data-value="4" aria-label="4 estrellas"><i class="far fa-star"></i></button>
+                        <button type="button" data-value="5" aria-label="5 estrellas"><i class="far fa-star"></i></button>
+                    </div>
+                    <input type="hidden" id="satisfaccion" name="satisfaccion" required>
+                    <span class="error-msg" id="error-satisfaccion"></span>
+                    <span class="rating-text" id="ratingText">Selecciona una calificación</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="notas">Notas adicionales</label>
+                    <textarea id="notas" name="notas" rows="4" placeholder="Información adicional sobre el cliente..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardar">
+                        <i class="fas fa-save"></i> <span id="btnGuardarText">Guardar Cliente</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- MODAL ELIMINAR -->
+    <div class="modal" id="modalEliminar">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmar eliminación</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.</p>
+                <p id="clienteEliminarNombre" style="font-weight:600; margin-top:8px; color:var(--color-danger);"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnCancelarEliminar">Cancelar</button>
+                <button class="btn btn-danger" id="btnConfirmarEliminar">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOASTS -->
+    
+        <!-- MODAL IMPORTAR EXCEL -->
+        <div class="modal" id="modalImportar">
+            <div class="modal-content" style="max-width: 520px;">
+                <div class="modal-header">
+                    <h3><i class="fas fa-file-upload"></i> Importar Clientes desde Excel</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="import-dropzone" id="importDropzone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Arrastra un archivo Excel aquí</strong></p>
+                        <p>o haz clic para seleccionar</p>
+                        <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" hidden>
+                    </div>
+                    <div class="import-info">
+                        <p><i class="fas fa-info-circle"></i> El archivo debe tener estas columnas:</p>
+                        <code>nombre, email, telefono, ciudad, departamento, fecha, categoria, satisfaccion, estado, notas</code>
+                    </div>
+                    <div class="import-preview hidden" id="importPreview">
+                        <p><strong id="importCount">0</strong> clientes encontrados</p>
+                        <div class="import-errors" id="importErrors"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="btnCancelarImportar">Cancelar</button>
+                    <button class="btn btn-primary" id="btnConfirmarImportar" disabled>
+                        <i class="fas fa-upload"></i> Importar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast-container" id="toastContainer"></div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
