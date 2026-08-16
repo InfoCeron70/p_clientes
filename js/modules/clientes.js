@@ -18,6 +18,7 @@ let ordenColumna = '';
 let ordenAscendente = true;
 
 export async function init() {
+    storage.cargarDatosEjemplo();  // Carga 20 ejemplos si no hay datos
     await cargarClientes();
     setupEventListeners();
 }
